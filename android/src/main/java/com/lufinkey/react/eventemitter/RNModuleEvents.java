@@ -9,61 +9,110 @@ public class RNModuleEvents
 {
 	HashMap<String, ArrayList<RNEventCallback>> eventListeners;
 
-	public void addEventListener(String eventName, int callbackId, Callback callback, boolean once)
+	public void addListener(String eventName, int callbackId, Callback callback, boolean once)
 	{
-		ArrayList<RNEventCallback> listeners = eventListeners.get(eventName);
-		if(listeners == null)
+		synchronized (eventListeners)
 		{
-			listeners = new ArrayList<>();
+			ArrayList<RNEventCallback> listeners = eventListeners.get(eventName);
+			if (listeners == null)
+			{
+				listeners = new ArrayList<>();
+				eventListeners.put(eventName, listeners);
+			}
+			listeners.add(new RNEventCallback(callbackId, callback, once));
 		}
-		listeners.add(new RNEventCallback(callbackId, callback, once));
 	}
 
-	public void removeEventListener(String eventName, int callbackId)
+	public void prependListener(String eventName, int callbackId, Callback callback, boolean once)
 	{
-		ArrayList<RNEventCallback> listeners = eventListeners.get(eventName);
-		for(int i=0; i<listeners.size(); i++)
+		synchronized (eventListeners)
 		{
-			RNEventCallback listener = listeners.get(i);
-			if(listener.getID() == callbackId)
+			ArrayList<RNEventCallback> listeners = eventListeners.get(eventName);
+			if (listeners == null)
 			{
-				listeners.remove(i);
-				return;
+				listeners = new ArrayList<>();
+				eventListeners.put(eventName, listeners);
 			}
+			listeners.add(0, new RNEventCallback(callbackId, callback, once));
+		}
+	}
+
+	public void removeListener(String eventName, int callbackId)
+	{
+		synchronized (eventListeners)
+		{
+			ArrayList<RNEventCallback> listeners = eventListeners.get(eventName);
+			for (int i=0; i<listeners.size(); i++)
+			{
+				RNEventCallback listener = listeners.get(i);
+				if (listener.getID() == callbackId)
+				{
+					listeners.remove(i);
+					return;
+				}
+			}
+		}
+	}
+
+	public void removeAllListeners(String eventName)
+	{
+		synchronized (eventListeners)
+		{
+			if (eventName == null)
+			{
+				eventListeners.clear();
+			}
+			else
+			{
+				eventListeners.remove(eventName);
+			}
+		}
+	}
+
+	public int getListenerCount(String eventName)
+	{
+		synchronized (eventListeners)
+		{
+			ArrayList<RNEventCallback> listeners = eventListeners.get(eventName);
+			if (listeners == null)
+			{
+				return 0;
+			}
+			return listeners.size();
 		}
 	}
 
 	public boolean emit(String eventName, Object... args)
 	{
-		ArrayList<RNEventCallback> listeners = null;
+		ArrayList<RNEventCallback> tmpListeners = null;
+
 		synchronized (eventListeners)
 		{
-			listeners = eventListeners.get(eventName);
-		}
-		synchronized (listeners)
-		{
-			if (listeners != null && listeners.size() > 0)
+			ArrayList<RNEventCallback> listeners = eventListeners.get(eventName);
+			tmpListeners = new ArrayList<>(listeners);
+
+			// remove "once" event listeners
+			for (int i=0; i<listeners.size(); i++)
 			{
-				ArrayList<RNEventCallback> tmpListeners = new ArrayList<>(listeners);
-				// remove "once" event listeners
-				for (int i=0; i<listeners.size(); i++)
+				RNEventCallback listener = listeners.get(i);
+				if(listener.isCalledOnlyOnce())
 				{
-					RNEventCallback listener = listeners.get(i);
-					if(listener.isCalledOnlyOnce())
-					{
-						listeners.remove(i);
-						i--;
-					}
+					listeners.remove(i);
+					i--;
 				}
-				//invoke events
-				for (int i = 0; i < tmpListeners.size(); i++)
-				{
-					RNEventCallback listener = tmpListeners.get(i);
-					listener.getCallback().invoke(args);
-				}
-				return true;
 			}
-			return false;
 		}
+
+		if (tmpListeners != null && tmpListeners.size() > 0)
+		{
+			//invoke events
+			for (int i = 0; i < tmpListeners.size(); i++)
+			{
+				RNEventCallback listener = tmpListeners.get(i);
+				listener.getCallback().invoke(args);
+			}
+			return true;
+		}
+		return false;
 	}
 }
