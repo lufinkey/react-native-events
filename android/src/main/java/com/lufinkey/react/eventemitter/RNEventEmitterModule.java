@@ -96,7 +96,7 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 		Object[] argsArray = args.toArrayList().toArray();
 		getModuleEvents(moduleId).emit(eventName, argsArray);
 
-		if(module != null && callModuleEvent)
+		if(callModuleEvent)
 		{
 			module.onModuleEvent(eventName, argsArray);
 		}
