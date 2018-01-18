@@ -89,16 +89,22 @@ public class RNModuleEvents
 		synchronized (eventListeners)
 		{
 			ArrayList<RNEventCallback> listeners = eventListeners.get(eventName);
-			tmpListeners = new ArrayList<>(listeners);
+			if(listeners != null)
+			{
+				tmpListeners = new ArrayList<>(listeners);
+			}
 
 			// remove "once" event listeners
-			for (int i=0; i<listeners.size(); i++)
+			if(listeners != null)
 			{
-				RNEventCallback listener = listeners.get(i);
-				if(listener.isCalledOnlyOnce())
+				for (int i = 0; i < listeners.size(); i++)
 				{
-					listeners.remove(i);
-					i--;
+					RNEventCallback listener = listeners.get(i);
+					if (listener.isCalledOnlyOnce())
+					{
+						listeners.remove(i);
+						i--;
+					}
 				}
 			}
 		}
