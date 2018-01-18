@@ -34,7 +34,7 @@ function onNativeModuleEvent(event)
 	{
 		return;
 	}
-	module.emit(event.eventName, ...event.args);
+	module._eventEmitter.emit(event.eventName, ...event.args);
 }
 
 
@@ -54,7 +54,7 @@ function registerNativeModule(nativeModule)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	else if(nativeModule.__eventEmitter)
+	else if(nativeModule._eventEmitter)
 	{
 		throw new Error("Native module has already been registered");
 	}
@@ -77,7 +77,16 @@ function registerNativeModule(nativeModule)
 			nativeModule[key] = value.bind(eventEmitter);
 		}
 	}
-	nativeModule.__eventEmitter = eventEmitter;
+	// set custom emit method
+	nativeModule.emit = function(eventName, ...args)
+	{
+		RNEventEmitter.emit(eventName, args);
+		eventEmitter.emit(eventName, ...args);
+	}
+	// set event emitter
+	nativeModule._eventEmitter = eventEmitter;
+
+	return nativeModule;
 }
 
 
