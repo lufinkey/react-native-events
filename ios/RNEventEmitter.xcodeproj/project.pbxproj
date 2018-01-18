@@ -7,23 +7,42 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A038EA6D2010585800132979 /* RNEventCallback.m in Sources */ = {isa = PBXBuildFile; fileRef = A038EA6C2010585800132979 /* RNEventCallback.m */; };
+		A038EA7020105AF200132979 /* RNModuleEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = A038EA6F20105AF200132979 /* RNModuleEvents.m */; };
+		A0538A452011069200D185A8 /* RNEventCallback.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = A038EA6B2010585800132979 /* RNEventCallback.h */; };
+		A0538A462011069200D185A8 /* RNEventConformer.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = A038EA6A2010572400132979 /* RNEventConformer.h */; };
+		A0538A472011069200D185A8 /* RNEventEmitter.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = B3E7B5881CC2AC0600A0062D /* RNEventEmitter.h */; };
+		A0538A482011069200D185A8 /* RNModuleEvents.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = A038EA6E20105AF200132979 /* RNModuleEvents.h */; };
+		A0538A4B2011094600D185A8 /* RNEventBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = A0538A4A2011094600D185A8 /* RNEventBridge.m */; };
 		B3E7B58A1CC2AC0600A0062D /* RNEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNEventEmitter.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		58B511D91A9E6C8500147676 /* CopyFiles */ = {
+		58B511D91A9E6C8500147676 /* Copy Headers */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
+			dstPath = include/RNEventEmitter;
 			dstSubfolderSpec = 16;
 			files = (
+				A0538A452011069200D185A8 /* RNEventCallback.h in Copy Headers */,
+				A0538A462011069200D185A8 /* RNEventConformer.h in Copy Headers */,
+				A0538A472011069200D185A8 /* RNEventEmitter.h in Copy Headers */,
+				A0538A482011069200D185A8 /* RNModuleEvents.h in Copy Headers */,
 			);
+			name = "Copy Headers";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNEventEmitter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNEventEmitter.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A038EA6A2010572400132979 /* RNEventConformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNEventConformer.h; sourceTree = "<group>"; };
+		A038EA6B2010585800132979 /* RNEventCallback.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNEventCallback.h; sourceTree = "<group>"; };
+		A038EA6C2010585800132979 /* RNEventCallback.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNEventCallback.m; sourceTree = "<group>"; };
+		A038EA6E20105AF200132979 /* RNModuleEvents.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNModuleEvents.h; sourceTree = "<group>"; };
+		A038EA6F20105AF200132979 /* RNModuleEvents.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNModuleEvents.m; sourceTree = "<group>"; };
+		A0538A492011094600D185A8 /* RNEventBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNEventBridge.h; sourceTree = "<group>"; };
+		A0538A4A2011094600D185A8 /* RNEventBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNEventBridge.m; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNEventEmitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNEventEmitter.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNEventEmitter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNEventEmitter.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -50,8 +69,15 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				A0538A492011094600D185A8 /* RNEventBridge.h */,
+				A0538A4A2011094600D185A8 /* RNEventBridge.m */,
+				A038EA6B2010585800132979 /* RNEventCallback.h */,
+				A038EA6C2010585800132979 /* RNEventCallback.m */,
+				A038EA6A2010572400132979 /* RNEventConformer.h */,
 				B3E7B5881CC2AC0600A0062D /* RNEventEmitter.h */,
 				B3E7B5891CC2AC0600A0062D /* RNEventEmitter.m */,
+				A038EA6E20105AF200132979 /* RNModuleEvents.h */,
+				A038EA6F20105AF200132979 /* RNModuleEvents.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,7 +91,7 @@
 			buildPhases = (
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
-				58B511D91A9E6C8500147676 /* CopyFiles */,
+				58B511D91A9E6C8500147676 /* Copy Headers */,
 			);
 			buildRules = (
 			);
@@ -113,6 +139,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				B3E7B58A1CC2AC0600A0062D /* RNEventEmitter.m in Sources */,
+				A038EA6D2010585800132979 /* RNEventCallback.m in Sources */,
+				A0538A4B2011094600D185A8 /* RNEventBridge.m in Sources */,
+				A038EA7020105AF200132979 /* RNModuleEvents.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -204,7 +233,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
-				"$(inherited)",
+					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../../../React/**",
 					"$(SRCROOT)/../../react-native/React/**",

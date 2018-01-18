@@ -38,14 +38,7 @@ function onNativeModuleEvent(event)
 }
 
 
-Platform.select({
-	ios: () => {
-		//TODO implement iOS
-	},
-	android: () => {
-		DeviceEventEmitter.addListener(EVENT_NAME, onNativeModuleEvent);
-	}
-})();
+DeviceEventEmitter.addListener(EVENT_NAME, onNativeModuleEvent);
 
 
 function registerNativeModule(nativeModule)
