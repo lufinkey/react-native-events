@@ -172,6 +172,9 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 		jsEvent.putArray("args", fromObjectArray(args));
 
 		reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(EVENT_NAME, jsEvent);
+
+		module.onEvent(eventName, args);
+		module.onNativeEvent(eventName, args);
 	}
 
 	@ReactMethod
@@ -185,6 +188,8 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 
 		Object[] argsArray = args.toArrayList().toArray();
 		getModuleEvents(moduleId).emit(eventName, argsArray);
+
+		module.onEvent(eventName, argsArray);
 		module.onJSEvent(eventName, argsArray);
 	}
 
