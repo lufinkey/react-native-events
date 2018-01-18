@@ -1,21 +1,26 @@
 
 package com.lufinkey.react.eventemitter;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class RNEventEmitterModule extends ReactContextBaseJavaModule
 {
 	private final ReactApplicationContext reactContext;
 
-	private final HashMap<RNEventConformer, Integer> registeredModules = new HashMap<>();
+	public static final String EVENT_NAME = "ayylmao_dicksnshit_nobodyUsethisevent PLS OK THANKS";
 
+	private final HashMap<RNEventConformer, Integer> registeredModules = new HashMap<>();
 	private final HashMap<Integer, RNModuleEvents> modules = new HashMap<>();
 
 	public RNEventEmitterModule(ReactApplicationContext reactContext)
@@ -29,6 +34,36 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 	{
 		return "RNEventEmitter";
 	}
+
+
+
+	public static RNEventEmitterModule getMainEventEmitter(ReactApplicationContext context)
+	{
+		return context.getNativeModule(RNEventEmitterModule.class);
+	}
+
+
+
+	public static void registerEventEmitterModule(ReactApplicationContext context, int moduleId, RNEventConformer module)
+	{
+		RNEventEmitterModule eventEmitter = getMainEventEmitter(context);
+		if(eventEmitter == null)
+		{
+			System.out.println("Error: No RNEventEmitterModule is available to register to");
+			return;
+		}
+		eventEmitter.registerModule(moduleId, module);
+	}
+
+	private void registerModule(int moduleId, RNEventConformer module)
+	{
+		synchronized (registeredModules)
+		{
+			registeredModules.put(module, moduleId);
+		}
+	}
+
+
 
 	private RNModuleEvents getModuleEvents(int moduleId)
 	{
@@ -59,47 +94,62 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 		}
 	}
 
-	@ReactMethod
-	public void addListener(int moduleId, String eventName, int callbackId, Callback callback, boolean once)
+	private WritableArray fromObjectArray(Object[] args)
 	{
-		getModuleEvents(moduleId).addListener(eventName, callbackId, callback, once);
-	}
-
-	@ReactMethod
-	public void prependListener(int moduleId, String eventName, int callbackId, Callback callback, boolean once)
-	{
-		getModuleEvents(moduleId).prependListener(eventName, callbackId, callback, once);
-	}
-
-	@ReactMethod
-	public void removeListener(int moduleId, String eventName, int callbackId)
-	{
-		getModuleEvents(moduleId).removeListener(eventName, callbackId);
-	}
-
-	@ReactMethod
-	public void removeAllListeners(int moduleId, String eventName)
-	{
-		getModuleEvents(moduleId).removeAllListeners(eventName);
-	}
-
-	@ReactMethod
-	public void emit(int moduleId, String eventName, ReadableArray args, boolean callModuleEvent)
-	{
-		RNEventConformer module = getRegisteredModule(moduleId);
-		if(module == null)
+		WritableArray array = Arguments.createArray();
+		for(Object arg : args)
 		{
-			System.out.println("Error: no module with moduleId "+moduleId+" has been registered to emit events");
+			if(arg == null)
+			{
+				array.pushNull();
+			}
+			else if(arg instanceof Boolean)
+			{
+				array.pushBoolean((Boolean)arg);
+			}
+			else if(arg instanceof Integer)
+			{
+				array.pushInt((Integer)arg);
+			}
+			else if(arg instanceof Double)
+			{
+				array.pushDouble((Double)arg);
+			}
+			else if(arg instanceof Float)
+			{
+				array.pushDouble((double)((Float)arg));
+			}
+			else if(arg instanceof String)
+			{
+				array.pushString((String)arg);
+			}
+			else if(arg instanceof WritableArray)
+			{
+				array.pushArray((WritableArray)arg);
+			}
+			else if(arg instanceof WritableMap)
+			{
+				array.pushMap((WritableMap)arg);
+			}
+			else
+			{
+				throw new IllegalArgumentException("Illegal object type");
+			}
+		}
+		return array;
+	}
+
+
+
+	public static void emitEvent(ReactApplicationContext context, RNEventConformer module, String eventName, Object... args)
+	{
+		RNEventEmitterModule eventEmitter = getMainEventEmitter(context);
+		if(eventEmitter == null)
+		{
+			System.out.println("Error: No RNEventEmitterModule is available to emit "+eventName+" event");
 			return;
 		}
-
-		Object[] argsArray = args.toArrayList().toArray();
-		getModuleEvents(moduleId).emit(eventName, argsArray);
-
-		if(callModuleEvent)
-		{
-			module.onModuleEvent(eventName, argsArray);
-		}
+		eventEmitter.emit(module, eventName, args);
 	}
 
 	public void emit(RNEventConformer module, String eventName, Object... args)
@@ -115,40 +165,114 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 			return;
 		}
 		getModuleEvents(moduleId).emit(eventName, args);
+
+		WritableMap jsEvent = Arguments.createMap();
+		jsEvent.putInt("moduleId", moduleId);
+		jsEvent.putString("eventName", eventName);
+		jsEvent.putArray("args", fromObjectArray(args));
+
+		reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(EVENT_NAME, jsEvent);
 	}
 
-	private void registerModule(int moduleId, RNEventConformer module)
+	@ReactMethod
+	private void emit(int moduleId, String eventName, ReadableArray args)
 	{
-		synchronized (registeredModules)
+		RNEventConformer module = getRegisteredModule(moduleId);
+		if(module == null)
 		{
-			registeredModules.put(module, moduleId);
+			throw new IllegalArgumentException("No module registered with ID "+moduleId);
 		}
+
+		Object[] argsArray = args.toArrayList().toArray();
+		getModuleEvents(moduleId).emit(eventName, argsArray);
+		module.onJSEvent(eventName, argsArray);
 	}
 
-	private static RNEventEmitterModule getMainEventEmitter(ReactApplicationContext context)
-	{
-		return context.getNativeModule(RNEventEmitterModule.class);
-	}
 
-	public static void registerEventEmitterModule(ReactApplicationContext context, int moduleId, RNEventConformer module)
+
+	public void addListener(RNEventConformer module, String eventName, Callback callback, boolean once)
 	{
-		RNEventEmitterModule eventEmitter = getMainEventEmitter(context);
-		if(eventEmitter == null)
+		Integer moduleId = registeredModules.get(module);
+		if(moduleId == null)
 		{
-			System.out.println("Error: No RNEventEmitterModule is available to register to");
-			return;
+			throw new IllegalArgumentException("Module "+module+" has not been registered");
 		}
-		eventEmitter.registerModule(moduleId, module);
+		addListener(moduleId, eventName, callback, once);
 	}
 
-	public static void emitEvent(ReactApplicationContext context, RNEventConformer module, String eventName, Object... args)
+	public void addListener(RNEventConformer module, String eventName, Callback callback)
 	{
-		RNEventEmitterModule eventEmitter = getMainEventEmitter(context);
-		if(eventEmitter == null)
+		addListener(module, eventName, callback, false);
+	}
+
+	public void addListener(int moduleId, String eventName, Callback callback)
+	{
+		addListener(moduleId, eventName, callback, false);
+	}
+
+	public void addListener(int moduleId, String eventName, Callback callback, boolean once)
+	{
+		getModuleEvents(moduleId).addListener(eventName, callback, once);
+	}
+
+
+
+	public void prependListener(RNEventConformer module, String eventName, Callback callback, boolean once)
+	{
+		Integer moduleId = registeredModules.get(module);
+		if(moduleId == null)
 		{
-			System.out.println("Error: No RNEventEmitterModule is available to emit "+eventName+" event");
-			return;
+			throw new IllegalArgumentException("Module "+module+" has not been registered");
 		}
-		eventEmitter.emit(module, eventName, args);
+		prependListener(moduleId, eventName, callback, once);
+	}
+
+	public void prependListener(RNEventConformer module, String eventName, Callback callback)
+	{
+		prependListener(module, eventName, callback, false);
+	}
+
+	public void prependListener(int moduleId, String eventName, Callback callback)
+	{
+		prependListener(moduleId, eventName, callback, false);
+	}
+
+	public void prependListener(int moduleId, String eventName, Callback callback, boolean once)
+	{
+		getModuleEvents(moduleId).prependListener(eventName, callback, once);
+	}
+
+
+
+	public void removeListener(RNEventConformer module, String eventName, Callback callback)
+	{
+		Integer moduleId = registeredModules.get(module);
+		if(moduleId == null)
+		{
+			throw new IllegalArgumentException("Module "+module+" has not been registered");
+		}
+		removeListener(moduleId, eventName, callback);
+	}
+
+	public void removeListener(int moduleId, String eventName, Callback callback)
+	{
+		getModuleEvents(moduleId).removeListener(eventName, callback);
+	}
+
+
+
+	public void removeAllListeners(RNEventConformer module, String eventName)
+	{
+		Integer moduleId = registeredModules.get(module);
+		if(moduleId == null)
+		{
+			throw new IllegalArgumentException("Module "+module+" has not been registered");
+		}
+		removeAllListeners(moduleId, eventName);
+	}
+
+	public void removeAllListeners(int moduleId, String eventName)
+	{
+		getModuleEvents(moduleId).removeAllListeners(eventName);
 	}
 }

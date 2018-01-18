@@ -7,9 +7,9 @@ import java.util.HashMap;
 
 public class RNModuleEvents
 {
-	HashMap<String, ArrayList<RNEventCallback>> eventListeners;
+	HashMap<String, ArrayList<RNEventCallback>> eventListeners = new HashMap<>();
 
-	public void addListener(String eventName, int callbackId, Callback callback, boolean once)
+	public void addListener(String eventName, Callback callback, boolean once)
 	{
 		synchronized (eventListeners)
 		{
@@ -19,11 +19,11 @@ public class RNModuleEvents
 				listeners = new ArrayList<>();
 				eventListeners.put(eventName, listeners);
 			}
-			listeners.add(new RNEventCallback(callbackId, callback, once));
+			listeners.add(new RNEventCallback(callback, once));
 		}
 	}
 
-	public void prependListener(String eventName, int callbackId, Callback callback, boolean once)
+	public void prependListener(String eventName, Callback callback, boolean once)
 	{
 		synchronized (eventListeners)
 		{
@@ -33,11 +33,11 @@ public class RNModuleEvents
 				listeners = new ArrayList<>();
 				eventListeners.put(eventName, listeners);
 			}
-			listeners.add(0, new RNEventCallback(callbackId, callback, once));
+			listeners.add(0, new RNEventCallback(callback, once));
 		}
 	}
 
-	public void removeListener(String eventName, int callbackId)
+	public void removeListener(String eventName, Callback callback)
 	{
 		synchronized (eventListeners)
 		{
@@ -45,7 +45,7 @@ public class RNModuleEvents
 			for (int i=0; i<listeners.size(); i++)
 			{
 				RNEventCallback listener = listeners.get(i);
-				if (listener.getID() == callbackId)
+				if (listener.getCallback() == callback)
 				{
 					listeners.remove(i);
 					return;

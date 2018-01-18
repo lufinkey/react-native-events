@@ -4,20 +4,13 @@ import com.facebook.react.bridge.Callback;
 
 public class RNEventCallback
 {
-	private int callbackId;
 	private Callback callback;
 	private boolean onlyOnce;
 
-	public RNEventCallback(int callbackId, Callback callback, boolean onlyOnce)
+	public RNEventCallback(Callback callback, boolean onlyOnce)
 	{
-		this.callbackId = callbackId;
 		this.callback = callback;
 		this.onlyOnce = onlyOnce;
-	}
-
-	public int getID()
-	{
-		return callbackId;
 	}
 
 	public Callback getCallback()
