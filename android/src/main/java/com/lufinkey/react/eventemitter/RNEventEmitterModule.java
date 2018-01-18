@@ -19,7 +19,7 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 
 	public static final String EVENT_NAME = "ayylmao_dicksnshit_nobodyUsethisevent PLS OK THANKS";
 
-	private final HashMap<RNEventConformer, Integer> registeredModules = new HashMap<>();
+	private final HashMap<Integer, RNEventConformer> registeredModules = new HashMap<>();
 	private final HashMap<Integer, RNModuleEvents> modules = new HashMap<>();
 
 	public RNEventEmitterModule(ReactApplicationContext reactContext)
@@ -58,15 +58,15 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 	{
 		synchronized (registeredModules)
 		{
-			if(registeredModules.containsKey(module))
+			if(registeredModules.containsValue(module))
 			{
 				throw new IllegalArgumentException("Module "+module+" has already been registered");
 			}
-			if(registeredModules.containsValue(moduleId))
+			if(registeredModules.containsKey(moduleId))
 			{
 				throw new IllegalArgumentException("moduleId "+moduleId+" has already been registered to a module");
 			}
-			registeredModules.put(module, moduleId);
+			registeredModules.put(moduleId, module);
 		}
 	}
 
@@ -90,9 +90,17 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 	{
 		synchronized (registeredModules)
 		{
-			for (HashMap.Entry<RNEventConformer, Integer> entry : registeredModules.entrySet())
+			return registeredModules.get(moduleId);
+		}
+	}
+
+	private Integer getRegisteredModuleID(RNEventConformer module)
+	{
+		synchronized (registeredModules)
+		{
+			for (HashMap.Entry<Integer, RNEventConformer> entry : registeredModules.entrySet())
 			{
-				if(entry.getValue() == moduleId)
+				if(entry.getValue() == module)
 				{
 					return entry.getKey();
 				}
@@ -164,7 +172,7 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 		Integer moduleId = null;
 		synchronized (registeredModules)
 		{
-			moduleId = registeredModules.get(module);
+			moduleId = getRegisteredModuleID(module);
 		}
 		if(moduleId == null)
 		{
@@ -204,7 +212,7 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 
 	public void addListener(RNEventConformer module, String eventName, Callback callback, boolean once)
 	{
-		Integer moduleId = registeredModules.get(module);
+		Integer moduleId = getRegisteredModuleID(module);
 		if(moduleId == null)
 		{
 			throw new IllegalArgumentException("Module "+module+" has not been registered");
@@ -231,7 +239,7 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 
 	public void prependListener(RNEventConformer module, String eventName, Callback callback, boolean once)
 	{
-		Integer moduleId = registeredModules.get(module);
+		Integer moduleId = getRegisteredModuleID(module);
 		if(moduleId == null)
 		{
 			throw new IllegalArgumentException("Module "+module+" has not been registered");
@@ -258,7 +266,7 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 
 	public void removeListener(RNEventConformer module, String eventName, Callback callback)
 	{
-		Integer moduleId = registeredModules.get(module);
+		Integer moduleId = getRegisteredModuleID(module);
 		if(moduleId == null)
 		{
 			throw new IllegalArgumentException("Module "+module+" has not been registered");
@@ -275,7 +283,7 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 
 	public void removeAllListeners(RNEventConformer module, String eventName)
 	{
-		Integer moduleId = registeredModules.get(module);
+		Integer moduleId = getRegisteredModuleID(module);
 		if(moduleId == null)
 		{
 			throw new IllegalArgumentException("Module "+module+" has not been registered");
