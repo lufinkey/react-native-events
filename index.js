@@ -1,9 +1,52 @@
 
-import { NativeModules } from 'react-native';
+import {
+	DeviceEventEmitter,
+	NativeModules,
+	Platform
+} from 'react-native';
+import EventEmitter from 'events';
 
 const { RNEventEmitter } = NativeModules;
 
+
+const EVENT_NAME = "ayylmao_dicksnshit_nobodyUsethisevent PLS OK THANKS";
+
+
 const moduleIdCounter = 0;
+function getNewModuleId()
+{
+	const moduleId = moduleIdCounter;
+	moduleIdCounter++;
+	return moduleId;
+}
+
+const registeredModules = {};
+function getRegisteredModule(moduleId)
+{
+	return registeredModules[''+moduleId];
+}
+
+
+function onNativeModuleEvent(event)
+{
+	var module = getRegisteredModule(event.moduleId);
+	if(module == null)
+	{
+		return;
+	}
+	module.emit(event.eventName, ...event.args);
+}
+
+
+Platform.select({
+	ios: () => {
+		//TODO implement iOS
+	},
+	android: () => {
+		DeviceEventEmitter.addListener(EVENT_NAME, onNativeModuleEvent);
+	}
+})();
+
 
 function registerNativeModule(nativeModule)
 {
@@ -11,10 +54,32 @@ function registerNativeModule(nativeModule)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	var moduleId = moduleIdCounter;
-	moduleIdCounter++;
+	else if(nativeModule.__eventEmitter)
+	{
+		throw new Error("Native module has already been registered");
+	}
+
+	// register native module
+	const moduleId = getNewModuleId();
 	nativeModule.__registerAsJSEventEmitter(moduleId);
+	registeredModules[''+moduleId] = nativeModule;
+
+	// add EventEmitter functions to native module
+	var eventEmitter = new EventEmitter();
+	var emitterKeys = Object.keys(EventEmitter.prototype);
+	for(var i=0; i<emitterKeys.length; i++)
+	{
+		var key = emitterKeys[i];
+		var value = EventEmitter.prototype[key];
+
+		if(typeof value == 'function')
+		{
+			nativeModule[key] = value.bind(eventEmitter);
+		}
+	}
+	nativeModule.__eventEmitter = eventEmitter;
 }
+
 
 export default {
 	registerNativeModule: registerNativeModule
