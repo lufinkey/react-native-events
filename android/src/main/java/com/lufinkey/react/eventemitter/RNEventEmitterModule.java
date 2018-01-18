@@ -9,7 +9,6 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.HashMap;
@@ -59,6 +58,14 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 	{
 		synchronized (registeredModules)
 		{
+			if(registeredModules.containsKey(module))
+			{
+				throw new IllegalArgumentException("Module "+module+" has already been registered");
+			}
+			if(registeredModules.containsValue(moduleId))
+			{
+				throw new IllegalArgumentException("moduleId "+moduleId+" has already been registered to a module");
+			}
 			registeredModules.put(module, moduleId);
 		}
 	}
