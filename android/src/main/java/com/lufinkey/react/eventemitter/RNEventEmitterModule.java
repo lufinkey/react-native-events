@@ -169,11 +169,7 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 
 	public void emit(RNEventConformer module, String eventName, Object... args)
 	{
-		Integer moduleId = null;
-		synchronized (registeredModules)
-		{
-			moduleId = getRegisteredModuleID(module);
-		}
+		Integer moduleId = getRegisteredModuleID(module);
 		if(moduleId == null)
 		{
 			System.out.println("Error: Cannot emit "+eventName+" event before "+module+" module has been registered");
