@@ -3,7 +3,7 @@
 
 A *non*-shitty (relatively speaking) EventEmitter implementation for react-native modules
 
-If you're tired of how react-native is supposed to be a cross platform framework, yet still contains weird platform-specific implementations for events, this is the repo for you. The *documented* way to send and receive events from a native module requires you to use different native classes *and* different javascript classes on iOS vs Android, *and* the events are global and could easily collide with another module's events. This module unifies the native events process, and allows native modules to conform to node's [EventEmitter](https://nodejs.org/dist/latest-v9.x/docs/api/events.html#events_class_eventemitter) class, meaning all of the methods from EventEmitter are callable from your module instance.
+If you're tired of how react-native is supposed to be a cross platform framework, yet still contains weird platform-specific implementations for events, this is the repo for you. The *documented* way to send and receive events from a native module requires you to use different native classes *and* different javascript classes on iOS vs Android, *and* the events are global and could easily collide with another module's events. This module unifies the native events process by allowing native modules to conform to node's [EventEmitter](https://nodejs.org/dist/latest-v9.x/docs/api/events.html#events_class_eventemitter) class, meaning all of the methods from EventEmitter are callable from your module instance.
 
 ## Setup
 
