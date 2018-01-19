@@ -13,7 +13,7 @@ Since this module is only meant to be used with other native modules, you have t
 npm install --save https://github.com/lufinkey/react-native-event-emitter
 ```
 
-**NOTE:** Inside your main project (NOT your native module), you must run `npm install` to install your module and its dependencies, and `react-native link` to actually link the native code to your app project.
+**NOTE:** Inside your main project (NOT your native module), after setting up your native module and adding it to your `package.json` file, you must run `npm install` to install your module and its dependencies, and `react-native link` to actually link the native code to your app project.
 
 Next, you must set up your native module to conform to an event emitter on each platform:
 
@@ -41,7 +41,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
 import com.lufinkey.react.eventemitter.RNEventConformer;
-import com.lufinkey.react.eventemitter.RNEventEmitterModule;
+import com.lufinkey.react.eventemitter.RNEventEmitter;
 
 public class MyNativeModule extends ReactContextBaseJavaModule implements RNEventConformer
 {
@@ -53,7 +53,7 @@ public class MyNativeModule extends ReactContextBaseJavaModule implements RNEven
 	@ReactMethod
 	public void __registerAsJSEventEmitter(int moduleId)
 	{
-		RNEventEmitterModule.registerEventEmitterModule(this.reactContext, moduleId, this);
+		RNEventEmitter.registerEventEmitterModule(this.reactContext, moduleId, this);
 	}
 	
 	@Override
@@ -73,5 +73,7 @@ public class MyNativeModule extends ReactContextBaseJavaModule implements RNEven
 	{
 		//Called when any event for this module is emitted
 	}
+	
+	...
 }
 ```
