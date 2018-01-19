@@ -1,7 +1,7 @@
 {
   "name": "react-native-event-emitter",
   "version": "1.0.0",
-  "description": "",
+  "description": "Make your react-native modules conform to node's EventEmitter",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,8 +9,8 @@
   "keywords": [
     "react-native"
   ],
-  "author": "",
-  "license": "",
+  "author": "lufinkey",
+  "license": "MIT",
   "peerDependencies": {
     "react-native": "^0.41.2"
   },
