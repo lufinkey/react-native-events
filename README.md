@@ -21,7 +21,7 @@ In order to set up your native module to conform to an EventEmitter on each plat
 
 Add `$(SRCROOT)/../../react-native-event-emitter/ios` to *Header Search Paths* in your project settings. (If your project is a scoped package, you may need to add more `../` to the path)
 
-Then make your native module conform to `RNEventConformer` like so:
+Then make your native module conform to `RNEventConformer`:
 
 ```objc
 // MyNativeModule.h
@@ -95,7 +95,7 @@ dependencies {
 ...
 ```
 
-Then make your native module conform to `RNEventConformer` like so:
+Then make your native module conform to `RNEventConformer`:
 
 ```java
 package com.reactlibrary.mynativemodule;
@@ -207,4 +207,3 @@ data.putString("c", "It's 4:20 somewhere");
 // send the events
 RNEventEmitter.emitEvent(this.reactContext, this, "something-happened", arg1, arg2);
 ```
-
