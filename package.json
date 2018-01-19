@@ -2,7 +2,7 @@
   "name": "react-native-event-emitter",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lufinkey/react-native-spotify.git"
+    "url": "https://github.com/lufinkey/react-native-event-emmiter.git"
   },
   "version": "1.0.0",
   "description": "Make your react-native modules conform to node's EventEmitter",
