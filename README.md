@@ -19,7 +19,7 @@ In order to set up your native module to conform to an EventEmitter on each plat
 
 #### iOS
 
-Add `$(SRCROOT)/../../react-native-events/ios` to *Header Search Paths* in your project settings. (If your project is a scoped package, you may need to add more `../` to the path)
+Add `$(SRCROOT)/../../react-native-events/ios` to *Header Search Paths* in the project settings of your native module. (If your module is a scoped package, you'll need to add one more `../` to the path)
 
 Then make your native module conform to `RNEventConformer`:
 
