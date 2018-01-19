@@ -10,7 +10,7 @@ If you're tired of how react-native claims to be a cross platform framework, yet
 Since this module is only meant to be used with other native modules, you have to add this module as a dependency inside of your native module (NOT inside of your main project):
 
 ```bash
-npm install --save https://github.com/lufinkey/react-native-events
+npm install --save react-native-events
 ```
 
 **note:** Inside your main project (NOT inside your native module), after setting up your native module and adding it to your `package.json` file, you must run `npm install` to install your module and its dependencies, and `react-native link` to actually link the native code to your app project.
