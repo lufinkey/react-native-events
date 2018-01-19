@@ -19,6 +19,8 @@ In order to set up your native module to conform to an EventEmitter on each plat
 
 #### iOS
 
+
+
 #### Android
 
 Edit `android/build.gradle` and add the `react-native-event-emitter` project to `dependencies`
