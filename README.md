@@ -13,7 +13,7 @@ Since this module is only meant to be used with other native modules, you have t
 npm install --save https://github.com/lufinkey/react-native-event-emitter
 ```
 
-**NOTE:** Inside your main project (NOT inside your native module), after setting up your native module and adding it to your `package.json` file, you must run `npm install` to install your module and its dependencies, and `react-native link` to actually link the native code to your app project.
+**note:** Inside your main project (NOT inside your native module), after setting up your native module and adding it to your `package.json` file, you must run `npm install` to install your module and its dependencies, and `react-native link` to actually link the native code to your app project.
 
 In order to set up your native module to conform to an EventEmitter on each platform, you must perform the following steps:
 
@@ -141,7 +141,7 @@ public class MyNativeModule extends ReactContextBaseJavaModule implements RNEven
 
 ## Usage
 
-In order for your native module to conform to node's EventEmitter class, you must register your module as an event emitter inside your module's `index.js` file using the `registerNativeModule` method:
+In order for your native module to conform to node's EventEmitter class, you must register your module as an event emitter inside your native module's `index.js` file using the `registerNativeModule` method:
 
 ```javascript
 import { NativeModules } from 'react-native';
@@ -155,7 +155,7 @@ MyNativeModule = NativeModuleEvents.registerNativeModule(MyNativeModule);
 export default MyNativeModule;
 ```
 
-### Sending and receiving events in javascript
+#### Sending and receiving events in javascript
 
 Once your native module has been registered with `registerNativeModule`, you may use any method available in the [EventEmitter](https://nodejs.org/dist/latest-v9.x/docs/api/events.html#events_class_eventemitter) class.
 
@@ -165,16 +165,17 @@ To receive events, you can just use the `addListener` method from EventEmitter. 
 import MyNativeModule from 'my-native-module-package';
 
 // add a listener to listen for the "something-happened" event
-MyNativeModule.addListener("something-happened", (data) => {
+MyNativeModule.addListener("something-happened", (arg1, arg2) => {
 	console.log("my event was called, and I received some data!");
-	console.log(data);
+	console.log("arg1: ", arg1);
+	console.log("arg2: ", arg2);
 });
 
-// send the "something-happened" event with some data attached"
-MyNativeModule.emit("something-happened", {a:"ayy", b:"lmao"});
+// send the "something-happened" event with 2 arguments
+MyNativeModule.emit("something-happened", {a:"ayy", b:"lmao"}, {c:"It's 4:20 somewhere"});
 ```
 
-### Sending and receiving events in native code
+#### Sending and receiving events in native code
 
 Any event sent from your native code will be received in your native modules's javascript event listeners for that event. Likewise, any event sent from javascript will be received in the `onEvent` and `onJSEvent` methods in your native code.
 
@@ -183,15 +184,27 @@ The following code shows how to send the same `something-happened` event from yo
 **Objective-C**
 
 ```objc
-[RNEventEmitter emitEvent:@"something-happened" withParams: module:self bridge:_bridge];
+
+// create event arguments
+NSDictionary* arg1 = @{ @"a":@"ayy", @"b":@"lmao" };
+NSDictionary* arg2 = @{ @"c":@"It's 4:20 somewhere" };
+
+// send the event
+[RNEventEmitter emitEvent:@"something-happened" withParams:@[ arg1, arg2 ] module:self bridge:_bridge];
 ```
 
 **Java**
 
 ```objc
 
-NSArray* eventParams = @[ @{@"a":@"ayy", @"b":@"lmao"} ];
+// create event arguments
+WritableMap arg1 = Arguments.createMap();
+data.putString("a", "ayy");
+data.putString("b", "lmao");
+WritableMap arg2 = Arguments.createMap();
+data.putString("c", "It's 4:20 somewhere");
 
-RNEventEmitter.emitEvent(this.reactContext, this, "something-happened"
+// send the events
+RNEventEmitter.emitEvent(this.reactContext, this, "something-happened", arg1, arg2);
 ```
 
