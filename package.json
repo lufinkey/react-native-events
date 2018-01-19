@@ -1,8 +1,8 @@
 {
-  "name": "react-native-event-emitter",
+  "name": "react-native-events",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lufinkey/react-native-event-emmiter.git"
+    "url": "https://github.com/lufinkey/react-native-events.git"
   },
   "version": "1.0.0",
   "description": "Make your react-native modules conform to node's EventEmitter",

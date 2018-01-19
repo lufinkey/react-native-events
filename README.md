@@ -1,5 +1,5 @@
 
-# react-native-event-emitter
+# react-native-events
 
 A *non*-shitty (relatively speaking) EventEmitter implementation for react-native modules
 
@@ -10,7 +10,7 @@ If you're tired of how react-native claims to be a cross platform framework, yet
 Since this module is only meant to be used with other native modules, you have to add this module as a dependency inside of your native module (NOT inside of your main project):
 
 ```bash
-npm install --save https://github.com/lufinkey/react-native-event-emitter
+npm install --save https://github.com/lufinkey/react-native-events
 ```
 
 **note:** Inside your main project (NOT inside your native module), after setting up your native module and adding it to your `package.json` file, you must run `npm install` to install your module and its dependencies, and `react-native link` to actually link the native code to your app project.
@@ -19,7 +19,7 @@ In order to set up your native module to conform to an EventEmitter on each plat
 
 #### iOS
 
-Add `$(SRCROOT)/../../react-native-event-emitter/ios` to *Header Search Paths* in your project settings. (If your project is a scoped package, you may need to add more `../` to the path)
+Add `$(SRCROOT)/../../react-native-events/ios` to *Header Search Paths* in your project settings. (If your project is a scoped package, you may need to add more `../` to the path)
 
 Then make your native module conform to `RNEventConformer`:
 
@@ -84,13 +84,13 @@ RCT_EXPORT_METHOD(__registerAsJSEventEmitter:(int)moduleId)
 
 #### Android
 
-Edit `android/build.gradle` and add the `react-native-event-emitter` project to `dependencies`
+Edit `android/build.gradle` and add the `react-native-events` project to `dependencies`
 
 ```
 ...
 dependencies {
 	compile 'com.facebook.react:react-native:+'
-	compile project(path: ':react-native-event-emitter')
+	compile project(path: ':react-native-events')
 }
 ...
 ```
@@ -145,7 +145,7 @@ In order for your native module to conform to node's EventEmitter class, you mus
 
 ```javascript
 import { NativeModules } from 'react-native';
-import NativeModuleEvents from 'react-native-event-emitter';
+import NativeModuleEvents from 'react-native-events';
 
 var MyNativeModule = NativeModules.MyNativeModule;
 
