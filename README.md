@@ -1,9 +1,9 @@
 
 # react-native-event-emitter
 
-A *non*-shitty (relatively speaking) EventEmitter implementation for react-native modules
+A *non*-shitty (relatively speaking) EventEmitter](https://nodejs.org/dist/latest-v9.x/docs/api/events.html#events_class_eventemitter) implementation for react-native modules
 
-If you're tired of how react-native claims to be a cross platform framework, yet still contains countless fragmented pieces of implementation, this is the repo for you. The *documented* way to send events from a native module requires you to use different native *and* javascript classes to implement events on iOS vs Android. This module unifies the native events process, *and* allows native modules to conform to node's EventEmitter.
+If you're tired of how react-native claims to be a cross platform framework, yet still contains countless fragmented pieces of implementation, this is the repo for you. The *documented* way to send events from a native module requires you to use different native *and* javascript classes to implement events on iOS vs Android. This module unifies the native events process, *and* allows native modules to conform to node's EventEmitter](https://nodejs.org/dist/latest-v9.x/docs/api/events.html#events_class_eventemitter).
 
 ## Setup
 
@@ -19,7 +19,53 @@ In order to set up your native module to conform to an EventEmitter on each plat
 
 #### iOS
 
+Add `$(SRCROOT)/../../react-native-event-emitter/ios` to *Header Search Paths* in your project settings. (If your project is a scoped package, you may need to add more `../` to the path)
 
+Then make your native module conform to `RNEventConformer` like so:
+
+```Objective-C
+// MyNativeModule.h
+
+#if __has_include("RCTBridgeModule.h")
+#import "RCTBridgeModule.h"
+#else
+#import <React/RCTBridgeModule.h>
+#endif
+
+#if __has_include("RNEventEmitter.h")
+#import "RNEventEmitter.h"
+#else
+#import <RNEventEmitter/RNEventEmitter.h>
+#endif
+
+@interface MyNativeModule : NSObject <RCTBridgeModule, RNEventConformer>
+
+...
+
+@end
+```
+
+```
+// MyNativeModule.m
+
+#import "MyNativeModule.h"
+
+@implementation MyNativeModule
+
+@synthesize bridge = _bridge;
+
+...
+
+RCT_EXPORT_METHOD(__registerAsJSEventEmitter:(int)moduleId)
+{
+	[RNEventEmitter registerEventEmitterModule:self withID:moduleId bridge:_bridge];
+}
+
+...
+
+@end
+
+```
 
 #### Android
 
@@ -34,7 +80,7 @@ dependencies {
 ...
 ```
 
-Then you must make your native module conform to `RNEventConformer` like so:
+Then make your native module conform to `RNEventConformer` like so:
 
 ```java
 package com.reactlibrary.mynativemodule;
@@ -48,8 +94,6 @@ import com.lufinkey.react.eventemitter.RNEventEmitter;
 public class MyNativeModule extends ReactContextBaseJavaModule implements RNEventConformer
 {
 	...
-	
-	// Add the following methods to the body of your native module class
 	
 	@Override
 	@ReactMethod
@@ -78,4 +122,36 @@ public class MyNativeModule extends ReactContextBaseJavaModule implements RNEven
 	
 	...
 }
+```
+
+## Usage
+
+If you would want your native module to conform to node's EventEmitter class, you must register your module as an event emitter inside your module's `index.js` file using the `registerNativeModule` method:
+
+```javascript
+import { NativeModules } from 'react-native';
+import NativeModuleEvents from 'react-native-event-emitter';
+
+const MyNativeModule = NativeModules.MyNativeModule;
+
+// Add EventEmitter methods to your native module
+MyNativeModule = NativeModuleEvents.registerNativeModule(MyNativeModule);
+
+export default MyNativeModule;
+```
+
+#### Sending and receiving events in javascript
+
+Once your native module has been registered with `registerNativeModule`, you may use any method available in the [EventEmitter](https://nodejs.org/dist/latest-v9.x/docs/api/events.html#events_class_eventemitter) class.
+
+To receive events, you can just use the `addListener` method from EventEmitter:
+
+```javascript
+
+import MyNativeModule from 'my-native-module-package';
+
+MyNativeModule.addListener("something-happened", (data) => {
+
+});
+
 ```
