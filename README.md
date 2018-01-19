@@ -15,7 +15,7 @@ npm install --save https://github.com/lufinkey/react-native-event-emitter
 
 **NOTE:** Inside your main project (NOT your native module), after setting up your native module and adding it to your `package.json` file, you must run `npm install` to install your module and its dependencies, and `react-native link` to actually link the native code to your app project.
 
-In order to set up your native module to conform to an event emitter on each platform, you must perform the following steps:
+In order to set up your native module to conform to an EventEmitter on each platform, you must perform the following steps:
 
 #### iOS
 
