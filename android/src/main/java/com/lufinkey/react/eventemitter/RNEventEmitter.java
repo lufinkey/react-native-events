@@ -13,7 +13,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.HashMap;
 
-public class RNEventEmitterModule extends ReactContextBaseJavaModule
+public class RNEventEmitter extends ReactContextBaseJavaModule
 {
 	private final ReactApplicationContext reactContext;
 
@@ -22,7 +22,7 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 	private final HashMap<Integer, RNEventConformer> registeredModules = new HashMap<>();
 	private final HashMap<Integer, RNModuleEvents> modules = new HashMap<>();
 
-	public RNEventEmitterModule(ReactApplicationContext reactContext)
+	public RNEventEmitter(ReactApplicationContext reactContext)
 	{
 		super(reactContext);
 		this.reactContext = reactContext;
@@ -36,19 +36,19 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 
 
 
-	public static RNEventEmitterModule getMainEventEmitter(ReactApplicationContext context)
+	public static RNEventEmitter getMainEventEmitter(ReactApplicationContext context)
 	{
-		return context.getNativeModule(RNEventEmitterModule.class);
+		return context.getNativeModule(RNEventEmitter.class);
 	}
 
 
 
 	public static void registerEventEmitterModule(ReactApplicationContext context, int moduleId, RNEventConformer module)
 	{
-		RNEventEmitterModule eventEmitter = getMainEventEmitter(context);
+		RNEventEmitter eventEmitter = getMainEventEmitter(context);
 		if(eventEmitter == null)
 		{
-			System.out.println("Error: No RNEventEmitterModule is available to register to");
+			System.out.println("Error: No RNEventEmitter is available to register to");
 			return;
 		}
 		eventEmitter.registerModule(moduleId, module);
@@ -158,10 +158,10 @@ public class RNEventEmitterModule extends ReactContextBaseJavaModule
 
 	public static void emitEvent(ReactApplicationContext context, RNEventConformer module, String eventName, Object... args)
 	{
-		RNEventEmitterModule eventEmitter = getMainEventEmitter(context);
+		RNEventEmitter eventEmitter = getMainEventEmitter(context);
 		if(eventEmitter == null)
 		{
-			System.out.println("Error: No RNEventEmitterModule is available to emit "+eventName+" event");
+			System.out.println("Error: No RNEventEmitter is available to emit "+eventName+" event");
 			return;
 		}
 		eventEmitter.emit(module, eventName, args);
