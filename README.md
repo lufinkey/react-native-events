@@ -164,22 +164,22 @@ To receive events, you can just use the `addListener` method from EventEmitter. 
 ```javascript
 import MyNativeModule from 'my-native-module-package';
 
-// add a listener to listen for the "something-happened" event
-MyNativeModule.addListener("something-happened", (arg1, arg2) => {
+// add a listener to listen for the "somethingHappened" event
+MyNativeModule.addListener("somethingHappened", (arg1, arg2) => {
 	console.log("my event was called, and I received some data!");
 	console.log("arg1: ", arg1);
 	console.log("arg2: ", arg2);
 });
 
-// send the "something-happened" event with 2 arguments
-MyNativeModule.emit("something-happened", {a:"ayy", b:"lmao"}, {c:"It's 4:20 somewhere"});
+// send the "somethingHappened" event with 2 arguments
+MyNativeModule.emit("somethingHappened", {a:"ayy", b:"lmao"}, {c:"It's 4:20 somewhere"});
 ```
 
 #### Sending and receiving events in native code
 
 Any event sent from your native code will be received in your native modules's javascript event listeners for that event. Likewise, any event sent from javascript will be received in the `onEvent` and `onJSEvent` methods in your native code.
 
-The following code shows how to send the same `something-happened` event from your native code's module class:
+The following code shows how to send the same `somethingHappened` event from your native code's module class:
 
 **Objective-C**
 
@@ -190,7 +190,7 @@ NSDictionary* arg1 = @{ @"a":@"ayy", @"b":@"lmao" };
 NSDictionary* arg2 = @{ @"c":@"It's 4:20 somewhere" };
 
 // send the event
-[RNEventEmitter emitEvent:@"something-happened" withParams:@[ arg1, arg2 ] module:self bridge:_bridge];
+[RNEventEmitter emitEvent:@"somethingHappened" withParams:@[ arg1, arg2 ] module:self bridge:_bridge];
 ```
 
 **Java**
@@ -205,5 +205,5 @@ WritableMap arg2 = Arguments.createMap();
 data.putString("c", "It's 4:20 somewhere");
 
 // send the events
-RNEventEmitter.emitEvent(this.reactContext, this, "something-happened", arg1, arg2);
+RNEventEmitter.emitEvent(this.reactContext, this, "somethingHappened", arg1, arg2);
 ```
