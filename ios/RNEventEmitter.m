@@ -32,6 +32,11 @@ RCT_EXPORT_MODULE()
 	return self;
 }
 
++(BOOL)requiresMainQueueSetup
+{
+	return YES;
+}
+
 +(RNEventEmitter*)eventEmitterForBridge:(RCTBridge*)bridge
 {
 	return [RNEventBridge moduleForClass:[RNEventEmitter class] bridge:bridge];
