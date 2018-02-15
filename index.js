@@ -41,13 +41,15 @@ function onNativeModuleEvent(event)
 DeviceEventEmitter.addListener(EVENT_NAME, onNativeModuleEvent);
 
 
-function registerNativeModule(nativeModule)
+function registerNativeModule(nativeModule, options)
 {
+	options = Object.assign({}, options);
+
 	if(!nativeModule.__registerAsJSEventEmitter)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	else if(nativeModule._eventEmitter)
+	else if(nativeModule.__rnEvents)
 	{
 		throw new Error("Native module has already been registered");
 	}
@@ -55,29 +57,38 @@ function registerNativeModule(nativeModule)
 	// register native module
 	const moduleId = getNewModuleId();
 	nativeModule.__registerAsJSEventEmitter(moduleId);
+	nativeModule.__rnEvents = {
+		preSubscribers: options.preSubscribers,
+		mainEmitter: null,
+		subscribers: options.subscribers
+	};
 	registeredModules[''+moduleId] = nativeModule;
 
-	// add EventEmitter functions to native module
-	var eventEmitter = new EventEmitter();
-	var emitterKeys = Object.keys(EventEmitter.prototype);
-	for(var i=0; i<emitterKeys.length; i++)
+	// conform native module if needed
+	if(options.conforms)
 	{
-		var key = emitterKeys[i];
-		var value = EventEmitter.prototype[key];
-
-		if(typeof value == 'function')
+		// add EventEmitter functions to native module
+		var eventEmitter = new EventEmitter();
+		var emitterKeys = Object.keys(EventEmitter.prototype);
+		for(var i=0; i<emitterKeys.length; i++)
 		{
-			nativeModule[key] = value.bind(eventEmitter);
+			var key = emitterKeys[i];
+			var value = EventEmitter.prototype[key];
+
+			if(typeof value == 'function')
+			{
+				nativeModule[key] = value.bind(eventEmitter);
+			}
 		}
+		// set custom emit method
+		nativeModule.emit = function(eventName, ...args)
+		{
+			RNEventEmitter.emit(eventName, args);
+			eventEmitter.emit(eventName, ...args);
+		}
+		// set event emitter
+		nativeModule.__rnEvents.mainEmitter = eventEmitter;
 	}
-	// set custom emit method
-	nativeModule.emit = function(eventName, ...args)
-	{
-		RNEventEmitter.emit(eventName, args);
-		eventEmitter.emit(eventName, ...args);
-	}
-	// set event emitter
-	nativeModule._eventEmitter = eventEmitter;
 
 	return nativeModule;
 }
