@@ -27,14 +27,34 @@ function getRegisteredModule(moduleId)
 }
 
 
+function sendJSEvents(nativeModule, eventName, args)
+{
+	if(nativeModule.__rnEvents.preSubscribers)
+	{
+		for(const subscriber of nativeModule.__rnEvents.preSubscribers)
+		{
+			subscriber.emit(eventName, ...args);
+		}
+	}
+	nativeModule.__rnEvents.mainEmitter.emit(eventName, ...args);
+	if(nativeModule.__rnEvents.subscribers)
+	{
+		for(const subscriber of nativeModule.__rnEvents.subscribers)
+		{
+			subscriber.emit(eventName, ...args);
+		}
+	}
+}
+
 function onNativeModuleEvent(event)
 {
-	var module = getRegisteredModule(event.moduleId);
-	if(module == null)
+	var nativeModule = getRegisteredModule(event.moduleId);
+	if(nativeModule == null)
 	{
 		return;
 	}
-	module._eventEmitter.emit(event.eventName, ...event.args);
+	console.log("event: ", event);
+	sendJSEvents(nativeModule, event.eventName, event.args);
 }
 
 
@@ -43,8 +63,6 @@ DeviceEventEmitter.addListener(EVENT_NAME, onNativeModuleEvent);
 
 function registerNativeModule(nativeModule, options)
 {
-	options = Object.assign({}, options);
-
 	if(!nativeModule.__registerAsJSEventEmitter)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
@@ -54,8 +72,19 @@ function registerNativeModule(nativeModule, options)
 		throw new Error("Native module has already been registered");
 	}
 
+	// validate options
+	options = Object.assign({}, options);
+	if(options.preSubscribers != null && !(options.preSubscribers instanceof Array))
+	{
+		throw new Error("options.preSubscribers must be an array");
+	}
+	if(options.subscribers != null && !(options.subscribers instanceof Array))
+	{
+		throw new Error("options.subscribers must be an array");
+	}
+
 	// register native module
-	const moduleId = getNewModuleId();
+	let moduleId = getNewModuleId();
 	nativeModule.__registerAsJSEventEmitter(moduleId);
 	nativeModule.__rnEvents = {
 		preSubscribers: options.preSubscribers,
@@ -64,31 +93,28 @@ function registerNativeModule(nativeModule, options)
 	};
 	registeredModules[''+moduleId] = nativeModule;
 
-	// conform native module if needed
-	if(options.conforms)
+	// add EventEmitter functions to native module
+	var eventEmitter = new EventEmitter();
+	var emitterKeys = Object.keys(EventEmitter.prototype);
+	for(var i=0; i<emitterKeys.length; i++)
 	{
-		// add EventEmitter functions to native module
-		var eventEmitter = new EventEmitter();
-		var emitterKeys = Object.keys(EventEmitter.prototype);
-		for(var i=0; i<emitterKeys.length; i++)
-		{
-			var key = emitterKeys[i];
-			var value = EventEmitter.prototype[key];
+		var key = emitterKeys[i];
+		var value = EventEmitter.prototype[key];
 
-			if(typeof value == 'function')
-			{
-				nativeModule[key] = value.bind(eventEmitter);
-			}
-		}
-		// set custom emit method
-		nativeModule.emit = function(eventName, ...args)
+		if(typeof value == 'function')
 		{
-			RNEventEmitter.emit(eventName, args);
-			eventEmitter.emit(eventName, ...args);
+			nativeModule[key] = value.bind(eventEmitter);
 		}
-		// set event emitter
-		nativeModule.__rnEvents.mainEmitter = eventEmitter;
 	}
+	// set custom emit method
+	nativeModule.emit = (eventName, ...args) => {
+		// send native event
+		RNEventEmitter.emit(moduleId, eventName, args);
+		// send js events
+		sendJSEvents(nativeModule, eventName, args);
+	}
+	// set event emitter
+	nativeModule.__rnEvents.mainEmitter = eventEmitter;
 
 	return nativeModule;
 }
