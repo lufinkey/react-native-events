@@ -218,6 +218,7 @@ RNEventEmitter.emitEvent(this.reactContext, this, "somethingHappened", arg1, arg
 ```
 
 
+---
 
 
 ## API Reference
