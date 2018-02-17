@@ -147,7 +147,7 @@ public class MyNativeModule extends ReactContextBaseJavaModule implements RNEven
 
 ## Usage
 
-In order for your native module to conform to node's EventEmitter class, you must register your module as an event emitter inside your native module's `index.js` file using the `registerNativeModule` method:
+In order for your native module to conform to node's EventEmitter class, you must first register your module as an event emitter inside your native module's `index.js` using the `register` method, and then conform it using the `conform` method:
 
 ```javascript
 import { NativeModules } from 'react-native';
