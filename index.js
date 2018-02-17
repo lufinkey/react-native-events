@@ -9,32 +9,20 @@ import EventEmitter from 'events';
 const { RNEventEmitter } = NativeModules;
 
 
+
 //========= INTERNAL FUNCTIONS =========//
 
 const EVENT_NAME = "ayylmao_dicksnshit_nobodyUsethisevent PLS OK THANKS";
 
-const nativeIdCounter = 0;
-function getNewNativeId()
+let moduleIdCounter = 1;
+function getNewModuleId()
 {
-	const nativeId = nativeIdCounter;
-	nativeIdCounter++;
-	return nativeId;
+	let moduleId = moduleIdCounter;
+	moduleIdCounter++;
+	return moduleId;
 }
 
 const registeredModules = {};
-
-function getModuleInfoFromNativeID(nativeId)
-{
-	for(const rnEventsId in registeredModules)
-	{
-		var moduleInfo = registeredModules[rnEventsId];
-		if(moduleInfo.nativeId == nativeId)
-		{
-			return moduleInfo;
-		}
-	}
-	return null;
-}
 
 function sendJSEvents(moduleInfo, eventName, args)
 {
@@ -55,7 +43,7 @@ function sendJSEvents(moduleInfo, eventName, args)
 // function called when an event is emitted from native code
 function onNativeModuleEvent(event)
 {
-	var moduleInfo = getModuleInfoFromNativeID(event.moduleId);
+	var moduleInfo = registeredModules[event.moduleId];
 	if(moduleInfo == null)
 	{
 		console.error("Received event for unregistered module with id "+event.moduleId);
@@ -70,24 +58,25 @@ DeviceEventEmitter.addListener(EVENT_NAME, onNativeModuleEvent);
 
 //========= EXPORTED FUNCTIONS =========//
 
-export function register(nativeModule)
+const RNEvents = {};
+module.exports = RNEvents;
+
+RNEvents.register = function(nativeModule)
 {
 	if(!nativeModule.__registerAsJSEventEmitter)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	else if(nativeModule.__rnEventsId)
+	else if(nativeModule.__rnEventsId != null)
 	{
 		throw new Error("Native module has already been registered");
 	}
 
 	// register native module
-	let nativeId = getNewNativeId();
-	let rnEventsId = new Symbol("RNEventsID");
-	nativeModule.__registerAsJSEventEmitter(nativeId);
-	registeredModules[rnEventsId] = {
+	let moduleId = getNewModuleId();
+	nativeModule.__registerAsJSEventEmitter(moduleId);
+	registeredModules[moduleId] = {
 		nativeModule: nativeModule,
-		nativeId: nativeId,
 		mainEmitter: null,
 		preSubscribers: [],
 		subscribers: []
@@ -95,20 +84,22 @@ export function register(nativeModule)
 
 	// define __rnEventsId property
 	Object.defineProperty(nativeModule, '__rnEventsId', {
-		value: rnEventsId,
+		value: moduleId,
 		writable: false
 	});
+
+	console.log("registered native module: ", nativeModule.__rnEventsId);
 
 	return nativeModule;
 }
 
-export function conform(nativeModule)
+RNEvents.conform = function(nativeModule)
 {
 	if(!nativeModule.__registerAsJSEventEmitter)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	else if(!nativeModule.__rnEventsId)
+	else if(nativeModule.__rnEventsId == null)
 	{
 		throw new Error("Native module has not been registered");
 	}
@@ -141,7 +132,7 @@ export function conform(nativeModule)
 	// set custom emit method
 	nativeModule.emit = (eventName, ...args) => {
 		// send native event
-		RNEventEmitter.emit(moduleInfo.nativeId, eventName, args);
+		RNEventEmitter.emit(moduleInfo.moduleId, eventName, args);
 		// send js events
 		sendJSEvents(moduleInfo, eventName, args);
 	};
@@ -151,13 +142,13 @@ export function conform(nativeModule)
 	return nativeModule;
 }
 
-export function emitNativeEvent(nativeModule, eventName, ...args)
+RNEvents.emitNativeEvent = function(nativeModule, eventName, ...args)
 {
 	if(!nativeModule.__registerAsJSEventEmitter)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	else if(!nativeModule.__rnEventsId)
+	else if(nativeModule.__rnEventsId == null)
 	{
 		throw new Error("Native module has not been registered");
 	}
@@ -168,16 +159,16 @@ export function emitNativeEvent(nativeModule, eventName, ...args)
 	}
 
 	// send native event
-	RNEventEmitter.emit(moduleInfo.nativeId, eventName, args);
+	RNEventEmitter.emit(moduleInfo.moduleId, eventName, args);
 }
 
-export function emitJSEvent(nativeModule, eventName, ...args)
+RNEvents.emitJSEvent = function(nativeModule, eventName, ...args)
 {
 	if(!nativeModule.__registerAsJSEventEmitter)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	else if(!nativeModule.__rnEventsId)
+	else if(nativeModule.__rnEventsId == null)
 	{
 		throw new Error("Native module has not been registered");
 	}
@@ -191,13 +182,13 @@ export function emitJSEvent(nativeModule, eventName, ...args)
 	sendJSEvents(moduleInfo, eventName, args);
 }
 
-export function addSubscriber(nativeModule, subscriber)
+RNEvents.addSubscriber = function(nativeModule, subscriber)
 {
 	if(!nativeModule.__registerAsJSEventEmitter)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	else if(!nativeModule.__rnEventsId)
+	else if(nativeModule.__rnEventsId == null)
 	{
 		throw new Error("Native module has not been registered");
 	}
@@ -215,13 +206,13 @@ export function addSubscriber(nativeModule, subscriber)
 	moduleInfo.subscribers.push(subscriber);
 }
 
-export function removeSubscriber(nativeModule, subscriber)
+RNEvents.removeSubscriber = function(nativeModule, subscriber)
 {
 	if(!nativeModule.__registerAsJSEventEmitter)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	else if(!nativeModule.__rnEventsId)
+	else if(nativeModule.__rnEventsId == null)
 	{
 		throw new Error("Native module has not been registered");
 	}
@@ -243,13 +234,13 @@ export function removeSubscriber(nativeModule, subscriber)
 	}
 }
 
-export function addPreSubscriber(nativeModule, subscriber)
+RNEvents.addPreSubscriber = function(nativeModule, subscriber)
 {
 	if(!nativeModule.__registerAsJSEventEmitter)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	else if(!nativeModule.__rnEventsId)
+	else if(nativeModule.__rnEventsId == null)
 	{
 		throw new Error("Native module has not been registered");
 	}
@@ -267,13 +258,13 @@ export function addPreSubscriber(nativeModule, subscriber)
 	moduleInfo.preSubscribers.push(subscriber);
 }
 
-export function removePreSubscriber(nativeModule, subscriber)
+RNEvents.removePreSubscriber = function(nativeModule, subscriber)
 {
 	if(!nativeModule.__registerAsJSEventEmitter)
 	{
 		throw new Error("Native module does not conform to RNEventConformer");
 	}
-	else if(!nativeModule.__rnEventsId)
+	else if(nativeModule.__rnEventsId == null)
 	{
 		throw new Error("Native module has not been registered");
 	}
