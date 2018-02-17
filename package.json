@@ -5,7 +5,7 @@
     "url": "https://github.com/lufinkey/react-native-events.git"
   },
   "version": "1.0.4",
-  "description": "Make your react-native modules conform to node's EventEmitter",
+  "description": "Send and receive events from react native modules",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
