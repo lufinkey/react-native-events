@@ -88,8 +88,6 @@ RNEvents.register = function(nativeModule)
 		writable: false
 	});
 
-	console.log("registered native module: ", nativeModule.__rnEventsId);
-
 	return nativeModule;
 }
 
