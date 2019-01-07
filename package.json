@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/lufinkey/react-native-events.git"
   },
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Send and receive events from react native modules",
   "main": "index.js",
   "scripts": {
