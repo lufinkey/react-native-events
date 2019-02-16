@@ -9,10 +9,12 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.HashMap;
 
+@ReactModule(name = "RNEventEmitter")
 public class RNEventEmitter extends ReactContextBaseJavaModule
 {
 	private final ReactApplicationContext reactContext;
