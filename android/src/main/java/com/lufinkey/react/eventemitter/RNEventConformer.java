@@ -1,7 +1,6 @@
 package com.lufinkey.react.eventemitter;
 
-public interface RNEventConformer
-{
+public interface RNEventConformer {
 	void __registerAsJSEventEmitter(int moduleId);
 
 	void onNativeEvent(String eventName, Object... args);
