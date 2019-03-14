@@ -14,6 +14,7 @@
 		A0538A472011069200D185A8 /* RNEventEmitter.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = B3E7B5881CC2AC0600A0062D /* RNEventEmitter.h */; };
 		A0538A482011069200D185A8 /* RNModuleEvents.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = A038EA6E20105AF200132979 /* RNModuleEvents.h */; };
 		A0538A4B2011094600D185A8 /* RNEventBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = A0538A4A2011094600D185A8 /* RNEventBridge.m */; };
+		A553AEEA223B075B004C373D /* RNEventBridge.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = A0538A492011094600D185A8 /* RNEventBridge.h */; };
 		B3E7B58A1CC2AC0600A0062D /* RNEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNEventEmitter.m */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +25,7 @@
 			dstPath = include/RNEventEmitter;
 			dstSubfolderSpec = 16;
 			files = (
+				A553AEEA223B075B004C373D /* RNEventBridge.h in Copy Headers */,
 				A0538A452011069200D185A8 /* RNEventCallback.h in Copy Headers */,
 				A0538A462011069200D185A8 /* RNEventConformer.h in Copy Headers */,
 				A0538A472011069200D185A8 /* RNEventEmitter.h in Copy Headers */,

@@ -6,6 +6,7 @@
 #endif
 
 #import "RNEventConformer.h"
+#import "RNEventBridge.h"
 
 @interface RNEventEmitter : NSObject <RCTBridgeModule>
 
