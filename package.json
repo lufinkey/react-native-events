@@ -19,7 +19,7 @@
   "author": "lufinkey",
   "license": "MIT",
   "peerDependencies": {
-    "react-native": "~0.63.4"
+    "react-native": "~0.68.2"
   },
   "dependencies": {
     "events": "^3.0.0"
